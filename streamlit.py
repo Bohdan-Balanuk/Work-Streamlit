@@ -27,7 +27,8 @@ def enrich_financials(df: pd.DataFrame) -> pd.DataFrame:
     df2['ROA'] = safe_div(df2.get('NetIncome'), df2.get('TotalAssets'))
     df2['ROE'] = safe_div(df2.get('NetIncome'), df2.get('TotalEquity'))
     # боргові співвідношення
-    df2['Debt'] = df2.get('ShortTermDebt', 0).fillna(0) + df2.get('LongTermDebt', 0).fillna(0)
+    df2['Debt'] = df2.get('ShortTermDebt', pd.Series(0, index=df2.index)).fillna(0) + \
+              df2.get('LongTermDebt', pd.Series(0, index=df2.index)).fillna(0)
     df2['DebtToEquity'] = safe_div(df2['Debt'], df2.get('TotalEquity'))
     return df2
 
