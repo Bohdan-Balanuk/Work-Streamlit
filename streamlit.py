@@ -1,4 +1,3 @@
-# file: finance_analysis.py
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -62,7 +61,7 @@ def plot_profitability_trends(df: pd.DataFrame, companies, metric='NetMargin', t
     fig.update_layout(yaxis_tickformat='.2%')  # показ у відсотках
     return fig
 
-# --- Побудова порівняльного стовпчикового графіка за галуззю ---
+#Побудова порівняльного стовпчикового графіка за галуззю
 def plot_industry_comparison(df: pd.DataFrame, year: int, metric='NetMargin'):
     data = df[df['Year'] == year].copy()
     # агрегуємо середні значення по галузях
@@ -71,14 +70,14 @@ def plot_industry_comparison(df: pd.DataFrame, year: int, metric='NetMargin'):
     fig.update_layout(xaxis_tickangle=-45, yaxis_tickformat='.2%')
     return fig
 
-# --- Табличний вивід коефіцієнтів для компанії за роками ---
+# Табличний вивід коефіцієнтів для компанії за роками
 def company_ratios_table(df: pd.DataFrame, company: str):
     data = df[df['Company'] == company].sort_values('Year')
     cols = ['Year','Revenue','NetIncome','CurrentRatio','QuickRatio','GrossMargin','OperatingMargin','NetMargin','ROA','ROE','DebtToEquity']
     present = [c for c in cols if c in data.columns]
     return data[present].reset_index(drop=True)
 
-# --- Приклад використання ---
+#Приклад використання
 if __name__ == "__main__":
     # path = "financials.csv"
     # df = load_financials(path)
