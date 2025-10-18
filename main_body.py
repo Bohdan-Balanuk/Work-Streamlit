@@ -10,9 +10,9 @@ def generate_financials(companies=None, industries=None, start_year=2000, end_ye
         seed = int(time.time())
     np.random.seed(seed)
     if companies is None:
-        companies = ["Help for every body", "Free for all"]
+        companies = ["Світло для всіх", "Мастерок", "Фіксік", "Теплий дім"]
     if industries is None:
-        industries = ["Energy", "Tech"]
+        industries = ["Енергетика", "Технологічні", "Технологічні", "Енергетика"]
 
     data = []
     for company, industry in zip(companies, industries):
