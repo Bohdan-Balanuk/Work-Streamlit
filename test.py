@@ -1,20 +1,68 @@
-from main_body import generate_financials, load_financials, enrich_financials, filter_data, plot_profitability_trends
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import streamlit as st
 
-# 0. Створення нової БД (CSV)
-df = generate_financials(
-    companies=["Help for every body", "Free for all"],
-    industries=["Energy", "Tech"],
-    start_year=2000,
-    end_year=2023
-)
+from main_body import generate_financials, enrich_financials
 
-# 1. Завантаження
-df = load_financials("financials.csv")
+# --- 1. Генерація або завантаження БД ---
+st.set_page_config(page_title="Аналіз фінансових показників", layout="wide")
+
+st.title("📊 Інтерактивний аналіз фінансових показників")
+
+if st.button("🔁 Створити нову базу даних"):
+    df = generate_financials()
+    st.success("✅ Нову базу даних створено!")
+else:
+    df = pd.read_csv("financials.csv")
+
 df = enrich_financials(df)
 
-# 2. Фільтр за роками та галуззюw
-df_filtered = filter_data(df, years=[2000, 2023], industries=['Energy', 'Tech'])
+# --- 2. Панель управління ---
+col1, col2, col3 = st.columns(3)
+years = sorted(df["Year"].unique())
+industries = df["Industry"].unique()
+companies = df["Company"].unique()
 
-# 3. Побудова графіка
-fig = plot_profitability_trends(df_filtered, companies=['Help for every body', 'Free for all'], metric='NetMargin', title='Net Margin Trend')
-fig.show()
+selected_years = col1.slider("📅 Обери роки", int(min(years)), int(max(years)), (2010, 2023))
+selected_industries = col2.multiselect("🏭 Обери галузі", industries, default=list(industries))
+selected_metric = col3.selectbox(
+    "📈 Обери показник для графіка:",
+    ["NetMargin", "GrossMargin", "OperatingMargin", "ROA", "ROE"]
+)
+
+# --- 3. Фільтрація даних ---
+df_filtered = df[
+    (df["Year"] >= selected_years[0]) &
+    (df["Year"] <= selected_years[1]) &
+    (df["Industry"].isin(selected_industries))
+]
+
+# --- 4. Побудова графіка ---
+fig = px.line(
+    df_filtered,
+    x="Year",
+    y=selected_metric,
+    color="Company",
+    markers=True,
+    title=f"{selected_metric} з {selected_years[0]} по {selected_years[1]}"
+)
+
+# Додаткові кнопки керування (масштаб, панорама, ресет)
+fig.update_layout(
+    hovermode="x unified",
+    xaxis=dict(
+        rangeslider=dict(visible=True),
+        showspikes=True,
+        spikemode="across",
+        spikecolor="gray"
+    ),
+    yaxis_tickformat=".2%",
+    legend_title_text="Компанія",
+)
+
+# --- 5. Відображення графіка та таблиці ---
+st.plotly_chart(fig, use_container_width=True)
+
+# --- 6. Таблиця даних ---
+st.dataframe(df_filtered.round(2), use_container_width=True)
