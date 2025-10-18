@@ -26,10 +26,22 @@ companies = df["Company"].unique()
 
 selected_years = col1.slider("📅 Обери роки", int(min(years)), int(max(years)), (2010, 2023))
 selected_industries = col2.multiselect("🏭 Обери галузі", industries, default=list(industries))
-selected_metric = col3.selectbox(
+# --- selectbox з перекладом ---
+metrics_map = {
+    "Чистий прибуток (%)": "NetMargin",
+    "Валовий прибуток (%)": "GrossMargin",
+    "Операційний прибуток (%)": "OperatingMargin",
+    "Рентабельність активів (ROA)": "ROA",
+    "Рентабельність власного капіталу (ROE)": "ROE"
+}
+
+selected_metric_ukr = col3.selectbox(
     "📈 Обери показник для графіка:",
-    ["NetMargin", "GrossMargin", "OperatingMargin", "ROA", "ROE"]
+    list(metrics_map.keys())
 )
+
+# фактична колонка для графіка
+selected_metric = metrics_map[selected_metric_ukr]
 
 # --- 3. Фільтрація даних ---
 df_filtered = df[
